@@ -35,6 +35,7 @@ func visit(path string, file_info os.FileInfo, err error) error {
 	path = strings.Join(directories, "/")
 	wait_group.Add(1)
 	go process(path)
+	return nil
 }
 
 func process(path string) {
