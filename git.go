@@ -43,19 +43,20 @@ func process(path string) {
 
 	output_string := string(output_bytes)
 	output_string = strings.Replace(output_string, "\n", "", -1)
+	fmt.Println(output_string)
 
 	one := "Changes not staged for commit"
 	if strings.Contains(output_string, one) {
-		fmt.Printf("%s: %s\n", path, one)
+		fmt.Printf("%28s: %s\n", one, path)
 	}
 
 	two := "Your branch is ahead"
 	if strings.Contains(output_string, two) {
-		fmt.Printf("%s: %s\n", path, two)
+		fmt.Printf("%28s: %s\n", two, path)
 	}
 
 	three := "Your branch is behind"
 	if strings.Contains(output_string, three) {
-		fmt.Printf("%s: %s\n", path, three)
+		fmt.Printf("%28s: %s\n", three, path)
 	}
 }
