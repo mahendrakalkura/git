@@ -25,6 +25,9 @@ func main() {
 func visit(path string, file_info os.FileInfo, err error) error {
 	directories := strings.Split(path, "/")
 	length := len(directories) - 1
+	if strings.Contains(path, "github.com") && !strings.Contains(path, "mahendrakalkura") {
+		return nil
+	}
 	if directories[length] != ".git" {
 		return nil
 	}
@@ -50,20 +53,19 @@ func process(path string) {
 
 	output_string := string(output_bytes)
 	output_string = strings.Replace(output_string, "\n", "", -1)
-	fmt.Println(output_string)
 
 	one := "Changes not staged for commit"
 	if strings.Contains(output_string, one) {
-		fmt.Printf("%28s: %s\n", one, path)
+		fmt.Printf("%29s: %s\n", one, path)
 	}
 
 	two := "Your branch is ahead"
 	if strings.Contains(output_string, two) {
-		fmt.Printf("%28s: %s\n", two, path)
+		fmt.Printf("%29s: %s\n", two, path)
 	}
 
 	three := "Your branch is behind"
 	if strings.Contains(output_string, three) {
-		fmt.Printf("%28s: %s\n", three, path)
+		fmt.Printf("%29s: %s\n", three, path)
 	}
 }
