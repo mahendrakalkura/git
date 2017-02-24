@@ -34,7 +34,7 @@ func visit(path string, file_info os.FileInfo, err error) error {
 }
 
 func process(path string) {
-	command := fmt.Sprintf("cd %s && git status", path)
+	command := fmt.Sprintf("cd %s && /usr/bin/git status", path)
 	output_bytes, err := exec.Command("/bin/bash", "-c", command).Output()
 	if err != nil {
 		panic(err)
