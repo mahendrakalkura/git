@@ -7,7 +7,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 )
+
+var wait_group sync.WaitGroup
 
 func main() {
 	directory := flag.String("directory", "", "")
@@ -16,6 +19,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	wait_group.Wait()
 }
 
 func visit(path string, file_info os.FileInfo, err error) error {
@@ -29,11 +33,13 @@ func visit(path string, file_info os.FileInfo, err error) error {
 	}
 	directories = directories[:length]
 	path = strings.Join(directories, "/")
+	wait_group.Add(1)
 	go process(path)
-	return nil
 }
 
 func process(path string) {
+	defer wait_group.Done()
+
 	command := fmt.Sprintf("cd %s && /usr/bin/git remote update && /usr/bin/git status", path)
 
 	output_bytes, err := exec.Command("/bin/bash", "-c", command).Output()
