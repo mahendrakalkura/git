@@ -2,8 +2,8 @@ How to install?
 ===============
 
 ```
-$ git clone --recursive git@github.com:mahendrakalkura/repositories.git
-$ cd repositories
+$ git clone --recursive git@github.com:mahendrakalkura/git.git
+$ cd git
 $ go get
 $ go build
 ```
@@ -12,6 +12,6 @@ How to run?
 ===========
 
 ```
-$ cd repositories
-$ ./repositories --directories=$HOME
+$ cd git
+$ ./git --directories=$HOME
 ```
