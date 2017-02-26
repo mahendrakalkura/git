@@ -28,6 +28,12 @@ func visit(path string, file_info os.FileInfo, err error) error {
 	if strings.Contains(path, "github.com") && !strings.Contains(path, "mahendrakalkura") {
 		return nil
 	}
+	if strings.Contains(path, "golang.org") {
+		return nil
+	}
+	if strings.Contains(path, "gopkg.in") {
+		return nil
+	}
 	if directories[length] != ".git" {
 		return nil
 	}
@@ -47,12 +53,13 @@ func process(path string) {
 	command := fmt.Sprintf("cd %s && /usr/bin/git remote update && /usr/bin/git status", path)
 
 	output_bytes, err := exec.Command("/bin/bash", "-c", command).Output()
-	if err != nil {
-		panic(err)
-	}
-
 	output_string := string(output_bytes)
 	output_string = strings.Replace(output_string, "\n", "", -1)
+	if err != nil {
+		fmt.Println(command)
+		fmt.Println(output_string)
+		panic(err)
+	}
 
 	one := "Changes not staged for commit"
 	if strings.Contains(output_string, one) {
