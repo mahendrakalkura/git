@@ -34,10 +34,13 @@ func visit(path string, file_info os.FileInfo, err error) error {
 	if strings.Contains(path, "gopkg.in") {
 		return nil
 	}
+	if directories[length-2] == "deps" {
+		return nil
+	}
 	if directories[length] != ".git" {
 		return nil
 	}
-	if directories[length-2] == "deps" {
+	if directories[length] != "hugo-agency-theme" {
 		return nil
 	}
 	directories = directories[:length]
