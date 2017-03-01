@@ -28,6 +28,12 @@ func visit(path string, file_info os.FileInfo, err error) error {
 	if directories[length] != ".git" {
 		return nil
 	}
+	if directories[length-1] == "hugo-agency-theme" {
+		return nil
+	}
+	if directories[length-2] == "deps" {
+		return nil
+	}
 	if strings.Contains(path, "github.com") && !strings.Contains(path, "mahendrakalkura") {
 		return nil
 	}
@@ -35,12 +41,6 @@ func visit(path string, file_info os.FileInfo, err error) error {
 		return nil
 	}
 	if strings.Contains(path, "gopkg.in") {
-		return nil
-	}
-	if directories[length-2] == "deps" {
-		return nil
-	}
-	if directories[length] == "hugo-agency-theme" {
 		return nil
 	}
 	directories = directories[:length]
@@ -64,9 +64,20 @@ func process(path string) {
 		panic(err)
 	}
 
-	one := "Changes not staged for commit"
+	one := "Your branch is behind"
 	if strings.Contains(output_string, one) {
-		fmt.Printf("%29s: %s\n", one, path)
+		command := fmt.Sprintf("cd %s && /usr/bin/git pull", path)
+
+		output_bytes, err := exec.Command("/bin/bash", "-c", command).Output()
+		output_string := string(output_bytes)
+		output_string = strings.Replace(output_string, "\n", "", -1)
+		if err != nil {
+			fmt.Println(command)
+			fmt.Println(output_string)
+			panic(err)
+		}
+
+		process(path)
 	}
 
 	two := "Your branch is ahead"
@@ -74,7 +85,7 @@ func process(path string) {
 		fmt.Printf("%29s: %s\n", two, path)
 	}
 
-	three := "Your branch is behind"
+	three := "Changes not staged for commit"
 	if strings.Contains(output_string, three) {
 		fmt.Printf("%29s: %s\n", three, path)
 	}
