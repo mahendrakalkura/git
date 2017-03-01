@@ -25,6 +25,9 @@ func main() {
 func visit(path string, file_info os.FileInfo, err error) error {
 	directories := strings.Split(path, "/")
 	length := len(directories) - 1
+	if directories[length] != ".git" {
+		return nil
+	}
 	if strings.Contains(path, "github.com") && !strings.Contains(path, "mahendrakalkura") {
 		return nil
 	}
@@ -37,10 +40,7 @@ func visit(path string, file_info os.FileInfo, err error) error {
 	if directories[length-2] == "deps" {
 		return nil
 	}
-	if directories[length] != ".git" {
-		return nil
-	}
-	if directories[length] != "hugo-agency-theme" {
+	if directories[length] == "hugo-agency-theme" {
 		return nil
 	}
 	directories = directories[:length]
