@@ -77,7 +77,8 @@ func process(path string) {
 			panic(err)
 		}
 
-		process(path)
+		wait_group.Add(1)
+		go process(path)
 	}
 
 	two := "Your branch is ahead"
