@@ -161,19 +161,13 @@ func process(path string) {
 func getTimestampsNew(path string) int {
 	timestamp := 0
 	visit := func(path string, fileInfo os.FileInfo, err error) error {
-		if strings.HasSuffix(path, "/.git") {
-			return nil
-		}
 		if strings.Contains(path, "/.git/") {
-			return nil
-		}
-		if strings.HasSuffix(path, "/ssh") {
 			return nil
 		}
 		if strings.Contains(path, "/ssh/0_master-") {
 			return nil
 		}
-		if !isDirectoryOrFile(path) {
+		if !isFile(path) {
 			return nil
 		}
 		stat, err := os.Stat(path)
@@ -210,6 +204,18 @@ func isDirectoryOrFile(path string) bool {
 		return true
 	}
 	if mode.IsDir() {
+		return true
+	}
+	return false
+}
+
+func isFile(path string) bool {
+	stat, statErr := os.Stat(path)
+	if statErr != nil {
+		return false
+	}
+	mode := stat.Mode()
+	if mode.IsRegular() {
 		return true
 	}
 	return false
