@@ -156,7 +156,6 @@ func process(path string) {
 	}
 
 	fmt.Printf("%38s: %s\n", colorsGreen("Processed"), path)
-	fmt.Println(timestampsNew, timestampsOld)
 }
 
 func getTimestampsNew(path string) int {
