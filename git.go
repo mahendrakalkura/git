@@ -112,8 +112,6 @@ func process(path string) {
 		return
 	}
 
-	timestamps.Set(path, timestampsNew)
-
 	command := fmt.Sprintf("cd %s && /usr/bin/git remote update && /usr/bin/git status", path)
 
 	outputBytes, err := exec.Command("/bin/bash", "-c", command).Output()
@@ -155,19 +153,27 @@ func process(path string) {
 		return
 	}
 
+	timestamps.Set(path, timestampsNew)
+
 	fmt.Printf("%38s: %s\n", colorsGreen("Processed"), path)
 }
 
 func getTimestampsNew(path string) int {
 	timestamp := 0
 	visit := func(path string, fileInfo os.FileInfo, err error) error {
+		if !isFile(path) {
+			return nil
+		}
+		if strings.HasSuffix(path, file) {
+			return nil
+		}
+		if strings.HasSuffix(path, "git") {
+			return nil
+		}
 		if strings.Contains(path, "/.git/") {
 			return nil
 		}
 		if strings.Contains(path, "/ssh/0_master-") {
-			return nil
-		}
-		if !isFile(path) {
 			return nil
 		}
 		stat, err := os.Stat(path)
