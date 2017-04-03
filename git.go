@@ -170,6 +170,9 @@ func getTimestampsNew(path string) int {
 		if strings.HasSuffix(path, "git") {
 			return nil
 		}
+		if strings.HasSuffix(path, "torrents") {
+			return nil
+		}
 		if strings.Contains(path, "/.git/") {
 			return nil
 		}
