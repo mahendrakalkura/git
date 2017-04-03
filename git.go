@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -18,56 +16,9 @@ var colorsGreen = color.New(color.FgGreen).SprintfFunc()
 var colorsRed = color.New(color.FgRed).SprintfFunc()
 var colorsYellow = color.New(color.FgYellow).SprintfFunc()
 
-var file = "git.json"
-
-// Timestamps ...
-type Timestamps struct {
-	sync.RWMutex
-	values map[string]int
-}
-
-// Get ...
-func (timestamps *Timestamps) Get(key string) int {
-	timestamps.RLock()
-	defer timestamps.RUnlock()
-	return timestamps.values[key]
-}
-
-// Set ...
-func (timestamps *Timestamps) Set(key string, value int) {
-	timestamps.Lock()
-	defer timestamps.Unlock()
-	timestamps.values[key] = value
-}
-
-var timestamps = Timestamps{
-	values: make(map[string]int),
-}
-
 var waitGroup sync.WaitGroup
 
-func init() {
-	_, statErr := os.Stat(file)
-	if os.IsNotExist(statErr) {
-		return
-	}
-	readFile, readFileErr := ioutil.ReadFile(file)
-	if readFileErr != nil {
-		panic(readFileErr)
-	}
-	json.Unmarshal(readFile, &timestamps.values)
-}
-
-func term() {
-	marshal, marshalErr := json.Marshal(timestamps.values)
-	if marshalErr != nil {
-		panic(marshalErr)
-	}
-	ioutil.WriteFile(file, marshal, 0644)
-}
-
 func main() {
-	defer term()
 	directory := flag.String("directory", "", "")
 	flag.Parse()
 	err := filepath.Walk(*directory, visit)
@@ -104,13 +55,6 @@ func visit(path string, fileInfo os.FileInfo, err error) error {
 
 func process(path string) {
 	defer waitGroup.Done()
-
-	timestampsNew := getTimestampsNew(path)
-	timestampsOld := getTimestampsOld(path)
-	if timestampsNew <= timestampsOld {
-		fmt.Printf("%38s: %s\n", colorsGreen("OK"), path)
-		return
-	}
 
 	command := fmt.Sprintf("cd %s && /usr/bin/git remote update && /usr/bin/git status", path)
 
@@ -153,54 +97,7 @@ func process(path string) {
 		return
 	}
 
-	timestamps.Set(path, timestampsNew)
-
-	fmt.Printf("%38s: %s\n", colorsGreen("Processed"), path)
-}
-
-func getTimestampsNew(path string) int {
-	timestamp := 0
-	visit := func(path string, fileInfo os.FileInfo, err error) error {
-		if !isFile(path) {
-			return nil
-		}
-		if strings.HasSuffix(path, file) {
-			return nil
-		}
-		if strings.HasSuffix(path, "git") {
-			return nil
-		}
-		if strings.HasSuffix(path, "torrents") {
-			return nil
-		}
-		if strings.Contains(path, "/.git/") {
-			return nil
-		}
-		if strings.Contains(path, "/ssh/0_master-") {
-			return nil
-		}
-		stat, err := os.Stat(path)
-		if err != nil {
-			panic(err)
-		}
-		modTime := stat.ModTime()
-		secondsInt64 := modTime.Unix()
-		secondsInt := int(secondsInt64)
-		if secondsInt > timestamp {
-			timestamp = secondsInt
-		}
-		return nil
-	}
-	err := filepath.Walk(path, visit)
-	if err != nil {
-		panic(err)
-	}
-	return timestamp
-}
-
-func getTimestampsOld(path string) int {
-	timestamp := timestamps.Get(path)
-	return timestamp
+	fmt.Printf("%38s: %s\n", colorsGreen("All clear"), path)
 }
 
 func isDirectoryOrFile(path string) bool {
@@ -213,18 +110,6 @@ func isDirectoryOrFile(path string) bool {
 		return true
 	}
 	if mode.IsDir() {
-		return true
-	}
-	return false
-}
-
-func isFile(path string) bool {
-	stat, statErr := os.Stat(path)
-	if statErr != nil {
-		return false
-	}
-	mode := stat.Mode()
-	if mode.IsRegular() {
 		return true
 	}
 	return false
