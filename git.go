@@ -29,7 +29,7 @@ func main() {
 }
 
 func visit(path string, fileInfo os.FileInfo, err error) error {
-	if !strings.Contains(path, "/bitbucket.org/") && !strings.Contains(path, "/github.com/mahendrakalkura/") {
+	if !strings.Contains(path, "/bitbucket.org/") && !strings.Contains(path, "/cogitosys.com/") && !strings.Contains(path, "/github.com/mahendrakalkura/") {
 		return nil
 	}
 	if !isDirectoryOrFile(path) {
