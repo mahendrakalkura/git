@@ -29,10 +29,10 @@ func main() {
 }
 
 func visit(path string, fileInfo os.FileInfo, err error) error {
-	if !strings.Contains(path, "/bitbucket.org/") && !strings.Contains(path, "/cogitosys.com/") && !strings.Contains(path, "/github.com/mahendrakalkura/") {
+	if !isDirectoryOrFile(path) {
 		return nil
 	}
-	if !isDirectoryOrFile(path) {
+	if !isValidDirectory(path) {
 		return nil
 	}
 	directories := strings.Split(path, "/")
@@ -41,6 +41,9 @@ func visit(path string, fileInfo os.FileInfo, err error) error {
 		return nil
 	}
 	if directories[length-1] == "hugo-agency-theme" {
+		return nil
+	}
+	if directories[length-1] == "startbootstrap-sb-admin-2" {
 		return nil
 	}
 	if directories[length-2] == "deps" {
@@ -54,7 +57,9 @@ func visit(path string, fileInfo os.FileInfo, err error) error {
 }
 
 func process(path string) {
+	fmt.Println(path)
 	defer waitGroup.Done()
+	return
 
 	command := fmt.Sprintf("cd %s && /usr/bin/git remote update && /usr/bin/git status", path)
 
@@ -110,6 +115,25 @@ func isDirectoryOrFile(path string) bool {
 		return true
 	}
 	if mode.IsDir() {
+		return true
+	}
+	return false
+}
+
+func isValidDirectory(path string) bool {
+	if strings.Contains(path, "/bitbucket.org/") {
+		return true
+	}
+	if strings.Contains(path, "/cogitosys.com/") {
+		return true
+	}
+	if strings.Contains(path, "/github.com/mahendrakalkura/") {
+		return true
+	}
+	if strings.Contains(path, "/github.com/netenberg/") {
+		return true
+	}
+	if strings.Contains(path, "/github.com/tweetTV/") {
 		return true
 	}
 	return false
