@@ -57,9 +57,7 @@ func visit(path string, fileInfo os.FileInfo, err error) error {
 }
 
 func process(path string) {
-	fmt.Println(path)
 	defer waitGroup.Done()
-	return
 
 	command := fmt.Sprintf("cd %s && /usr/bin/git remote update && /usr/bin/git status", path)
 
