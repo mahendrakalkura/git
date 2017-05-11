@@ -13,5 +13,5 @@ How to run?
 
 ```
 $ cd git
-$ ./git --directories=$HOME
+$ ./git --directory $HOME
 ```
