@@ -29,7 +29,7 @@ func main() {
 }
 
 func visit(path string, fileInfo os.FileInfo, err error) error {
-	if !isDirectoryOrFile(path) {
+	if !isDirectory(path) {
 		return nil
 	}
 	if !isValidDirectory(path) {
@@ -65,9 +65,8 @@ func process(path string) {
 	outputString := string(outputBytes)
 	outputString = strings.Replace(outputString, "\n", "", -1)
 	if err != nil {
-		fmt.Println(command)
-		fmt.Println(outputString)
-		panic(err)
+		fmt.Printf("%38s: %s\n", colorsRed("Error #1"), path)
+		return
 	}
 
 	one := "Your branch is behind"
@@ -78,9 +77,8 @@ func process(path string) {
 		outputString := string(outputBytes)
 		outputString = strings.Replace(outputString, "\n", "", -1)
 		if err != nil {
-			fmt.Println(command)
-			fmt.Println(outputString)
-			panic(err)
+			fmt.Printf("%38s: %s\n", colorsRed("Error #2"), path)
+			return
 		}
 
 		waitGroup.Add(1)
@@ -103,15 +101,12 @@ func process(path string) {
 	fmt.Printf("%38s: %s\n", colorsGreen("All clear"), path)
 }
 
-func isDirectoryOrFile(path string) bool {
+func isDirectory(path string) bool {
 	stat, statErr := os.Stat(path)
 	if statErr != nil {
 		return false
 	}
 	mode := stat.Mode()
-	if mode.IsRegular() {
-		return true
-	}
 	if mode.IsDir() {
 		return true
 	}
@@ -122,9 +117,6 @@ func isValidDirectory(path string) bool {
 	if strings.Contains(path, "/bitbucket.org/") {
 		return true
 	}
-	if strings.Contains(path, "/cogitosys.com/") {
-		return true
-	}
 	if strings.Contains(path, "/github.com/mahendrakalkura/") {
 		return true
 	}
@@ -132,6 +124,12 @@ func isValidDirectory(path string) bool {
 		return true
 	}
 	if strings.Contains(path, "/github.com/tweetTV/") {
+		return true
+	}
+	if strings.Contains(path, "/gitlab.kalkura.com/") {
+		return true
+	}
+	if strings.Contains(path, "/gitlab.medialeg.ch/") {
 		return true
 	}
 	return false
